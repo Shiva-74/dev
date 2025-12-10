@@ -1,0 +1,57 @@
+gcloud storage cp -r gs://spls/gsp021/* .
+cd orchestrate-with-kubernetes/Kubernetes
+ls
+
+kubectl create deployment nginx --image=nginx:1.27.0
+kubectl get pods
+kubectl expose deployment nginx --port 80 --type LoadBalancer
+kubectl get services
+curl http://<External IP>:80
+
+cd ~/orchestrate-with-kubernetes/Kubernetes
+cat pods/fortune-app.yaml
+kubectl create -f pods/fortune-app.yaml
+kubectl get pods
+kubectl describe pods fortune-app
+
+kubectl port-forward fortune-app 10080:8080
+curl http://127.0.0.1:10080
+curl http://127.0.0.1:10080/secure
+curl -u user http://127.0.0.1:10080/login
+TOKEN=$(curl -u user http://127.0.0.1:10080/login | jq -r '.token')
+curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:10080/secure
+kubectl logs fortune-app
+kubectl logs -f fortune-app
+curl http://127.0.0.1:10080
+kubectl exec fortune-app --stdin --tty -c fortune-app -- /bin/sh
+ping -c 3 google.com
+exit
+
+cd ~/orchestrate-with-kubernetes/Kubernetes
+cat pods/secure-fortune.yaml
+kubectl create secret generic tls-certs --from-file tls/  
+kubectl create configmap nginx-proxy-conf --from-file nginx/proxy.conf  
+kubectl create -f pods/secure-fortune.yaml
+kubectl create -f services/fortune-app.yaml
+gcloud compute firewall-rules create allow-fortune-nodeport --allow tcp:31000
+gcloud compute instances list
+curl -k https://<EXTERNAL_IP>:31000
+
+kubectl get pods -l "app=fortune-app"
+kubectl get pods -l "app=fortune-app,secure=enabled"
+kubectl label pods secure-fortune 'secure=enabled'
+kubectl get pods secure-fortune --show-labels
+kubectl describe services fortune-app | grep Endpoints
+gcloud compute instances list
+curl -k https://<EXTERNAL_IP>:31000
+
+cat deployments/auth.yaml
+kubectl create -f deployments/auth.yaml
+kubectl create -f services/auth.yaml
+kubectl create -f deployments/fortune-service.yaml
+kubectl create -f services/fortune-service.yaml
+kubectl create configmap nginx-frontend-conf --from-file=nginx/frontend.conf  
+kubectl create -f deployments/frontend.yaml  
+kubectl create -f services/frontend.yaml
+kubectl get services frontend
+curl -k https://<EXTERNAL-IP>
