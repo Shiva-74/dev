@@ -1,8 +1,8 @@
 1
 
-curl -LO raw.githubusercontent.com/quiccklabs/Labs_solutions/master/Implement%20Load%20Balancing%20on%20Compute%20Engine%20Challenge%20Lab/quicklabgsp313.sh
-sudo chmod +x quicklabgsp313.sh
-./quicklabgsp313.sh
+curl -LO raw.githubusercontent.com/prateekrajput08/Arcade-Google-Cloud-Labs/refs/heads/main/Implement%20Load%20Balancing%20on%20Compute%20Engine%3A%20Challenge%20Lab/TechCode.sh
+sudo chmod +x TechCode.sh 
+./TechCode.sh
 
 2
 
