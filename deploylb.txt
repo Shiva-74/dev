@@ -1,0 +1,9 @@
+gsutil -m cp -r gs://spls/gsp233/* .
+cd tf-gke-k8s-service-lb
+cat main.tf
+cat k8s.tf
+
+terraform init
+terraform apply -var="region="Region to be allocated"" -var="location="Zone to be allocated""
+
+NM > Kubernetes Engine > tf-gke-k8s > Gateways, Services & Ingress > Endpoints
