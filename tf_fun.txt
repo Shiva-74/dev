@@ -1,0 +1,21 @@
+terraform
+gcloud services enable cloudaicompanion.googleapis.com
+
+enable gemini-code-assist
+
+touch instance.tf
+
+Generate the Terraform configuration for a Google Compute Engine virtual machine, saving it to instance.tf, based on the following specifications:
+
+* Project ID: Project ID
+* VM Name: terraform
+* Machine Type: e2-medium
+* Deployment Zone: zone
+* Boot Disk: Debian 12
+* Network: Default network
+
+ls
+terraform init
+terraform plan
+terraform apply
+terraform show

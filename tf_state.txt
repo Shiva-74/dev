@@ -1,0 +1,131 @@
+Enable gemini code assist
+
+gcloud services enable cloudaicompanion.googleapis.com
+
+touch main.tf
+
+In editor of main.tf
+
+provider "google" {
+  project     = "# REPLACE WITH YOUR PROJECT ID"
+  region      = "REGION"
+}
+
+resource "google_storage_bucket" "test-bucket-for-state" {
+  name        = "# REPLACE WITH YOUR PROJECT ID"
+  location    = "US"
+  uniform_bucket_level_access = true
+}
+
+
+Update the main.tf configuration file with the following changes:
+
+* In the Google provider block, set the project to PROJECT_ID.
+* In the "test-bucket-for-state" resource block, update the name of the bucket to BUCKET_NAME.
+
+add to main.tf
+
+terraform {
+  backend "local" {
+    path = "terraform/state/terraform.tfstate"
+  }
+}
+
+In terminal
+
+terraform init
+terraform apply
+terraform show
+
+In main.tf the above by 
+
+terraform {
+  backend "gcs" {
+    bucket  = "BUCKET_NAME"
+    prefix  = "terraform/state"
+  }
+}
+
+terraform init -migrate-state
+
+go to cloud storage buckets > labels > Add label
+Set the Key 2 = key and Value 2 = value
+
+In terminal
+
+terraform refresh
+terraform show
+
+now in main.tf again change 
+
+terraform {
+  backend "local" {
+    path = "terraform/state/terraform.tfstate"
+  }
+}
+
+terraform init -migrate-state
+
+Update the google_storage_bucket resource named "test-bucket-for-state" in the main.tf file. Add the force_destroy = true argument to its configuration.
+
+terraform apply
+terraform destroy
+
+docker run --name hashicorp-learn --detach --publish 8080:80 nginx:latest
+docker ps
+git clone https://github.com/hashicorp/learn-terraform-import.git
+cd learn-terraform-import
+sed -i 's/version = "~> 3.0.2"/version = ">= 3.5"/' terraform.tf
+terraform init --upgrade
+
+In editor go to learn-terraform-import/main.tf find provider: docker
+
+provider "docker" {
+#   host    = "npipe:////.//pipe//docker_engine"
+}
+
+resource "docker_container" "web" {}
+
+docker ps
+terraform import docker_container.web $(docker inspect -f {{.ID}} hashicorp-learn)
+terraform show
+terraform plan
+terraform show -no-color > docker.tf
+terraform plan
+terraform plan
+terraform apply
+
+docker image inspect <IMAGE-ID> -f {{.RepoTags}}
+
+add to docker.tf
+
+resource "docker_image" "nginx" {
+  name         = "nginx:latest"
+}
+
+terraform apply
+
+open docker.tf
+
+Update the image argument in the docker_container resource named web within the docker.tf file. Set its value to docker_image.nginx.image_id.
+
+terraform apply
+
+in docker.tf change external port from 8080 to 8081
+
+resource "docker_container" "web" {
+  name  = "hashicorp-learn"
+  image = docker_image.nginx.image_id
+
+  ports {
+    external = 8081
+    internal = 80
+    ip       = "0.0.0.0"
+    protocol = "tcp"
+  }
+}
+
+terraform apply
+docker ps
+terraform destroy
+docker ps --filter "name=hashicorp-learn"
