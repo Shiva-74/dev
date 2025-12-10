@@ -1,0 +1,128 @@
+curl -LO https://raw.githubusercontent.com/Itsabhishek7py/GoogleCloudSkillsboost/refs/heads/main/Continuous%20Delivery%20with%20Jenkins%20in%20Kubernetes%20Engine/abhishek1.sh
+sudo chmod +x abhishek1.sh
+./abhishek1.sh
+
+
+
+Add your service account credentials
+Configure your credentials to allow Jenkins to access the code repository. Jenkins uses your cluster's service account credentials to download code from the GitHub repository.
+
+In the Jenkins user interface, click Manage Jenkins in the left navigation then click Security > Credentials.
+
+Click System.
+
+Credentials page
+
+Click Global credentials (unrestricted).
+
+Click Add Credentials in the top right corner.
+
+Select Google Service Account from metadata from the Kind drop-down.
+
+Under the ID field enter the Project ID and click Create.
+
+Note: `Project ID` found in the `CONNECTION DETAILS` section of the lab.
+The global credentials have been added.
+
+Global credentials (unrestricted) page
+
+Configure Jenkins Cloud for Kubernetes
+In the Jenkins user interface, select Manage Jenkins > Nodes.
+Click Clouds in the left navigation pane.
+Click New cloud.
+Type any name under Cloud name and then select Kubernetes for Type.
+Click Create.
+In the Jenkins URL field, enter the following value: http://cd-jenkins:8080
+In the Jenkins tunnel field, enter the following value: cd-jenkins-agent:50000
+Click Save.
+Authenticate Jenkins with a GitHub private repo using an SSH key
+To authenticate Jenkins with a GitHub private repository using an SSH key follow below steps:
+
+a. Generate the SSH Key
+
+Create a new GitHub SSH key, where github-email is your GitHub email address:
+ssh-keygen -t rsa -b 4096 -N '' -f id_github -C [your-github-email]
+Copied!
+To download the private key(id_github) and public key(id_github.pub) from your local machine, in the Cloud Shell action bar, click More (More icon) and select the folder continuous-deployment-on-kubernetes/sample-app.
+b. Add the public key to GitHub
+
+After generating the SSH key, you need to add the public key to GitHub so Jenkins can access your repositories.
+
+Go to your GitHub account. Click your github profile and navigate to Settings.
+
+From the side menu, select SSH and GPG keys.
+
+Click New SSH key.
+
+Enter the title SSH_KEY_LAB.
+
+Paste the contents of your public key (id_github.pub) downloaded from path (~/continuous-deployment-on-kubernetes/sample-app/id_github.pub) into the Key field. You can also add a descriptive name in the Title field.
+
+Click Add SSH key.
+
+c. Configure the Jenkins to use the SSH key
+
+Go to Jenkins and select Manage Jenkins from the main dashboard.
+
+Select the Credentials option.
+
+Under Stores scoped to Jenkins. click System.
+
+Click Global credentials (unrestricted).
+
+Click Add Credentials.
+
+In the Kind dropdown, select SSH Username with private key.
+
+For ID enter qwiklabs-gcp-00-463f0cf9462f_ssh_key.
+
+For Username, type [your GitHub username]
+
+Choose Enter directly for the private key and click Add. Paste the content of the id_github file (downloaded from ~/continuous-deployment-on-kubernetes/sample-app/id_github).
+
+Click Create.
+
+d. Add the public SSH key to known hosts
+
+In Cloud Shell create a file named known_hosts.github and add the public SSH key to this file.
+
+ssh-keyscan -t rsa github.com > known_hosts.github
+chmod +x known_hosts.github
+cat known_hosts.github
+Copied!
+Note: If you are seeing any errors in Cloud Shell press CTRL+C and then execute the above command.
+e. Configure known host key
+
+Click Dashboard > Manage Jenkins in the left panel.
+
+Under Security. Click Security.
+
+Under Git Host Key Verification Configuration for Host Key Verification Strategy select Manually provided keys from drop down.
+
+Paste the known hosts.github file content in Approved Host Keys.
+
+Click Save.
+
+Create the Jenkins job
+Navigate to your Jenkins user interface and follow these steps to configure a Pipeline job.
+
+Click Dashboard > New Item in the left panel.
+
+Name the project sample-app, then choose the Multibranch Pipeline option and click OK.
+
+On the next page, in the Branch Sources section, select Git from Add Source dropdown.
+
+Paste the HTTPS clone URL of your sample-app repo under the Project Repository field. Replace ${GITHUB_USERNAME} with your Github username:
+
+git@github.com:${GITHUB_USERNAME}/default.git
+Copied!
+From the Credentials menu options, select the github credentials name.
+
+Under the Scan Multibranch Pipeline Triggers section, check the Periodically if not otherwise run box and set the Interval value to 1 minute.
+
+Leave all other options at their defaults and click Save.
+
+
+curl -LO https://raw.githubusercontent.com/Itsabhishek7py/GoogleCloudSkillsboost/refs/heads/main/Continuous%20Delivery%20with%20Jenkins%20in%20Kubernetes%20Engine/abhishek2.sh
+sudo chmod +x abhishek2.sh
+./abhishek2.sh
